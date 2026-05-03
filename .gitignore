@@ -1,0 +1,23 @@
+bin/
+obj/
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.rsuser
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+# Publish artifacts and logs.
+artifacts/
+publish/
+logs/
+*.log
+
+# OS/editor noise.
+Thumbs.db
+Desktop.ini
+.DS_Store
