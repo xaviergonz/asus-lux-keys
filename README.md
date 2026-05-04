@@ -1,6 +1,6 @@
-# Keyboard Ambient Light
+# AsusLuxKeys
 
-Keyboard Ambient Light is a small Windows tray utility that adjusts ASUS keyboard backlight brightness from the ambient light sensor.
+AsusLuxKeys is a small Windows tray utility that adjusts ASUS keyboard backlight brightness from the ambient light sensor.
 
 It is intended for ASUS laptops where you want the keyboard to dim or brighten automatically as room lighting changes. The app uses static keyboard lighting only, with optional static color control on devices that support it.
 
@@ -53,35 +53,35 @@ Options auto-save after valid changes. If a lumens value is incomplete or invali
 Restore dependencies:
 
 ```powershell
-dotnet restore KeyboardAmbientLight.slnx
+dotnet restore AsusLuxKeys.slnx
 ```
 
 Build:
 
 ```powershell
-dotnet build KeyboardAmbientLight.slnx
+dotnet build AsusLuxKeys.slnx
 ```
 
 Run the tray app:
 
 ```powershell
-dotnet run --project src\KeyboardAmbientLight\KeyboardAmbientLight.csproj
+dotnet run --project src\AsusLuxKeys\AsusLuxKeys.csproj
 ```
 
 Run unit tests:
 
 ```powershell
-dotnet test KeyboardAmbientLight.slnx
+dotnet test AsusLuxKeys.slnx
 ```
 
 Run unit tests without rebuilding:
 
 ```powershell
-dotnet test KeyboardAmbientLight.slnx --no-build
+dotnet test AsusLuxKeys.slnx --no-build
 ```
 
 Check formatting:
 
 ```powershell
-dotnet format KeyboardAmbientLight.slnx --verify-no-changes
+dotnet format AsusLuxKeys.slnx --verify-no-changes
 ```
