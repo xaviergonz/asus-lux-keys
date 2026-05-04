@@ -85,3 +85,16 @@ Check formatting:
 ```powershell
 dotnet format AsusLuxKeys.slnx --verify-no-changes
 ```
+
+## Publishing a Release
+
+GitHub Releases are created automatically when a version tag is pushed.
+
+Use a `vMAJOR.MINOR.PATCH` tag:
+
+```powershell
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+The release workflow builds the Release version, publishes the `win-x64` app, zips it as `AsusLuxKeys-win-x64.zip`, and attaches it to the GitHub Release.
