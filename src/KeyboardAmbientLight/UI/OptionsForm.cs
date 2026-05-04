@@ -32,7 +32,7 @@ public sealed class OptionsForm : Form
     private bool _loading;
     private string _color;
 
-    public OptionsForm(AppSettings settings, Func<double?> currentLumens, bool showColorOptions, bool runOnStartup)
+    public OptionsForm(AppSettings settings, Func<double?> currentLumens, bool showColorOptions, bool runOnStartup, Icon icon)
     {
         Text = "Keyboard Ambient Light Options";
         StartPosition = FormStartPosition.CenterScreen;
@@ -45,7 +45,7 @@ public sealed class OptionsForm : Form
         TopMost = true;
         Font = SystemFonts.MessageBoxFont;
         BackColor = SystemColors.Control;
-        Icon = AppIconFactory.CreateIcon();
+        Icon = (Icon)icon.Clone();
 
         _color = settings.Color;
         _currentLumens = currentLumens;

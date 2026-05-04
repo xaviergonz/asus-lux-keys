@@ -21,6 +21,11 @@ public sealed class AsusStaticKeyboardLightController : IDisposable
         _canSetAcpiBrightness = _acpi.CanSetBrightness;
         _canSetHidStaticColor = _hid.CanSetStaticColor;
         _canSetAcpiStaticColor = _acpi.CanSetStaticColor;
+
+        if (_canSetHidStaticColor)
+        {
+            _hid.InitializeAuraLighting();
+        }
     }
 
     public bool CanSetBrightness => _canSetHidBrightness || _canSetAcpiBrightness;
@@ -44,6 +49,11 @@ public sealed class AsusStaticKeyboardLightController : IDisposable
                 if (_canSetHidBrightness)
                 {
                     _hid.SetBrightnessLevel(level);
+                }
+
+                if (_canSetHidStaticColor)
+                {
+                    _hid.SetAuraBrightnessLevel(level);
                 }
 
                 if (_canSetAcpiBrightness)

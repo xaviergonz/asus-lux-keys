@@ -19,6 +19,7 @@ public sealed class AsusHidDevice
 
     private static readonly byte[] MessageSet = [AuraReportId, 0xB5, 0, 0, 0];
     private static readonly byte[] MessageApply = [AuraReportId, 0xB4];
+    private static readonly byte[] MessageInitializeAura = [AuraReportId, 0xBD, 0x01, AuraReportId, 0x1F, 0xFF, 0xFF, 0xFF];
 
     public bool CanSetBrightness => FindDevices(InputReportId).Any();
 
@@ -27,6 +28,16 @@ public sealed class AsusHidDevice
     public void SetBrightnessLevel(int level)
     {
         WriteInput([InputReportId, 0xBA, 0xC5, 0xC4, (byte)Math.Clamp(level, 0, 3)], "HID keyboard brightness");
+    }
+
+    public void SetAuraBrightnessLevel(int level)
+    {
+        WriteAura([[AuraReportId, 0xBA, 0xC5, 0xC4, (byte)Math.Clamp(level, 0, 3)]], "HID Aura keyboard brightness");
+    }
+
+    public void InitializeAuraLighting()
+    {
+        WriteAura([MessageInitializeAura], "HID Aura lighting init");
     }
 
     public void SetStaticColor(Color color)

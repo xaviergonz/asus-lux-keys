@@ -1,3 +1,5 @@
+using KeyboardAmbientLight.UI;
+
 namespace KeyboardAmbientLight;
 
 static class Program
@@ -7,6 +9,17 @@ static class Program
     {
         ApplicationConfiguration.Initialize();
 
+        var icon = AppIconFactory.CreateIcon();
+        if (icon is null)
+        {
+            MessageBox.Show(
+                "The application icon asset could not be found or loaded. Keyboard Ambient Light will now exit.",
+                "Keyboard Ambient Light",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+            return;
+        }
+
         var lightSensor = new Ambient.LightSensorService();
         if (!lightSensor.IsAvailable)
         {
@@ -15,6 +28,7 @@ static class Program
                 "Keyboard Ambient Light",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error);
+            icon.Dispose();
             lightSensor.Dispose();
             return;
         }
@@ -27,11 +41,12 @@ static class Program
                 "Keyboard Ambient Light",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error);
+            icon.Dispose();
             keyboard.Dispose();
             lightSensor.Dispose();
             return;
         }
 
-        Application.Run(new Tray.KeyboardAmbientLightAppContext(lightSensor, keyboard));
+        Application.Run(new Tray.KeyboardAmbientLightAppContext(lightSensor, keyboard, icon));
     }
 }
