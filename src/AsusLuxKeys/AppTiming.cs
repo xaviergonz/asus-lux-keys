@@ -2,6 +2,5 @@ namespace AsusLuxKeys;
 
 public static class AppTiming
 {
-    public const int ReconcileIntervalMilliseconds = 2000;
-    public const int RequiredStableSignalTicks = 3;
+    public const int ReconcileIntervalMilliseconds = 3000;
 }

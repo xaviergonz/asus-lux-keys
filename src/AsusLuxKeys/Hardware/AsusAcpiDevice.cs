@@ -48,6 +48,22 @@ public sealed class AsusAcpiDevice : IDisposable
 
     public bool CanSetStaticColor => IsSupported(TufKeyboard) || IsSupported(TufKeyboard2);
 
+    public KeyboardBrightness? GetBrightness()
+    {
+        var status = DeviceGet(TufKeyboardBrightness);
+        if (status < 0)
+        {
+            return null;
+        }
+
+        if (status == 0x8000)
+        {
+            return KeyboardBrightness.Off;
+        }
+
+        return (KeyboardBrightness)Math.Clamp(status & 0x7F, 0, 3);
+    }
+
     public void SetBrightnessLevel(int level)
     {
         if (!IsConnected)
@@ -76,7 +92,7 @@ public sealed class AsusAcpiDevice : IDisposable
             0xEB
         ];
 
-        var result = DeviceSet(TufKeyboard, setting, "ACPI static keyboard color");
+        var result = DeviceSet(TufKeyboard, setting, "ACPI static keyboard color", logFailure: false);
         if (result != 1)
         {
             setting[0] = 0xB3;
@@ -101,7 +117,11 @@ public sealed class AsusAcpiDevice : IDisposable
         BitConverter.GetBytes((uint)status).CopyTo(args, 4);
 
         var result = BitConverter.ToInt32(CallMethod(Devs, args), 0);
-        AppLog.Write($"{logName} = {status}: {(result == 1 ? "OK" : result)}");
+        if (result != 1)
+        {
+            AppLog.Write($"{logName} failed for {status}: {result}");
+        }
+
         return result;
     }
 
@@ -130,14 +150,18 @@ public sealed class AsusAcpiDevice : IDisposable
         return BitConverter.ToInt32(status, 0) - 65536;
     }
 
-    private int DeviceSet(uint deviceId, byte[] parameters, string logName)
+    private int DeviceSet(uint deviceId, byte[] parameters, string logName, bool logFailure = true)
     {
         byte[] args = new byte[4 + parameters.Length];
         BitConverter.GetBytes(deviceId).CopyTo(args, 0);
         parameters.CopyTo(args, 4);
 
         var result = BitConverter.ToInt32(CallMethod(Devs, args), 0);
-        AppLog.Write($"{logName} = {BitConverter.ToString(parameters)}: {(result == 1 ? "OK" : result)}");
+        if (logFailure && result != 1)
+        {
+            AppLog.Write($"{logName} failed for {BitConverter.ToString(parameters)}: {result}");
+        }
+
         return result;
     }
 

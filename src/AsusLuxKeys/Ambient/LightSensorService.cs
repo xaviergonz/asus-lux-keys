@@ -7,8 +7,6 @@ public sealed class LightSensorService : IDisposable
 {
     private readonly LightSensor? _sensor;
 
-    public event EventHandler<double>? ReadingChanged;
-
     public LightSensorService()
     {
         try
@@ -22,7 +20,6 @@ public sealed class LightSensorService : IDisposable
 
             _sensor.ReportInterval = Math.Max(_sensor.MinimumReportInterval, AppTiming.ReconcileIntervalMilliseconds);
             LatestLux = _sensor.GetCurrentReading()?.IlluminanceInLux;
-            _sensor.ReadingChanged += SensorReadingChanged;
         }
         catch (Exception ex)
         {
@@ -57,14 +54,7 @@ public sealed class LightSensorService : IDisposable
     {
         if (_sensor is not null)
         {
-            _sensor.ReadingChanged -= SensorReadingChanged;
             _sensor.ReportInterval = 0;
         }
-    }
-
-    private void SensorReadingChanged(LightSensor sender, LightSensorReadingChangedEventArgs args)
-    {
-        LatestLux = args.Reading.IlluminanceInLux;
-        ReadingChanged?.Invoke(this, LatestLux.Value);
     }
 }

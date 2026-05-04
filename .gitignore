@@ -1,3 +1,5 @@
+.dotnet/
+
 bin/
 obj/
 .vs/

@@ -1,5 +1,4 @@
 using System.Drawing;
-using AsusLuxKeys.Logging;
 
 namespace AsusLuxKeys.Hardware;
 
@@ -30,9 +29,14 @@ public sealed class AsusStaticKeyboardLightController : IDisposable
 
     public bool CanSetBrightness => _canSetHidBrightness || _canSetAcpiBrightness;
 
+    public bool CanReadBrightness => _canSetAcpiBrightness;
+
     public bool CanSetStaticColor => _canSetHidStaticColor || _canSetAcpiStaticColor;
 
-    public KeyboardLightState? LastApplied { get; private set; }
+    public KeyboardBrightness? GetCurrentBrightness()
+    {
+        return _canSetAcpiBrightness ? _acpi.GetBrightness() : null;
+    }
 
     public async Task SetAsync(KeyboardBrightness brightness, Color? color, CancellationToken cancellationToken = default)
     {
@@ -75,10 +79,6 @@ public sealed class AsusStaticKeyboardLightController : IDisposable
                     }
                 }
             }, cancellationToken);
-
-            LastApplied = new KeyboardLightState(colorToSet, brightness);
-            var colorText = colorToSet is null ? "without color" : $"with {ColorTranslator.ToHtml(colorToSet.Value)}";
-            AppLog.Write($"Applied keyboard brightness {brightness.ToDisplayText()} (level {level}) {colorText}.");
         }
         finally
         {

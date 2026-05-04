@@ -56,7 +56,6 @@ public sealed class AsusHidDevice
                 var payload = new byte[device.GetMaxFeatureReportLength()];
                 Array.Copy(data, payload, Math.Min(data.Length, payload.Length));
                 stream.SetFeature(payload);
-                AppLog.Write($"{logName} {device.ProductID:X4}: {BitConverter.ToString(data)}");
             }
             catch (Exception ex)
             {
@@ -75,7 +74,6 @@ public sealed class AsusHidDevice
                 foreach (var message in messages)
                 {
                     stream.Write(message);
-                    AppLog.Write($"{logName} {device.ProductID:X4}: {BitConverter.ToString(message)}");
                 }
             }
             catch (Exception ex)

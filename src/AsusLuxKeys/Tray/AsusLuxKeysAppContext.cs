@@ -18,8 +18,6 @@ public sealed class AsusLuxKeysAppContext : ApplicationContext
     private readonly SemaphoreSlim _reconcileGate = new(1, 1);
 
     private AppSettings _settings;
-    private KeyboardLightState? _pendingState;
-    private int _pendingStateTicks;
     private bool _runOnStartup;
     private OptionsForm? _optionsForm;
 
@@ -45,11 +43,10 @@ public sealed class AsusLuxKeysAppContext : ApplicationContext
         {
             Interval = AppTiming.ReconcileIntervalMilliseconds
         };
-        _timer.Tick += async (_, _) => await ReconcileAsync(countAsStableTick: true);
-        _lightSensor.ReadingChanged += async (_, _) => await ReconcileAsync(countAsStableTick: false);
+        _timer.Tick += async (_, _) => await ReconcileAsync();
         _timer.Start();
 
-        _ = ReconcileAsync(countAsStableTick: true);
+        _ = ReconcileAsync();
     }
 
     protected override void Dispose(bool disposing)
@@ -99,7 +96,7 @@ public sealed class AsusLuxKeysAppContext : ApplicationContext
             _keyboard.CanSetStaticColor,
             _runOnStartup,
             _icon);
-        _optionsForm.SettingsSaved += async (_, args) =>
+        _optionsForm.SettingsSaved += (_, args) =>
         {
             _settings = args.Settings;
             _settingsStore.Save(_settings);
@@ -116,14 +113,12 @@ public sealed class AsusLuxKeysAppContext : ApplicationContext
             {
                 _runOnStartup = args.RunOnStartup;
             }
-
-            await ReconcileAsync(countAsStableTick: false);
         };
         _optionsForm.Show();
         _optionsForm.Activate();
     }
 
-    private async Task ReconcileAsync(bool countAsStableTick)
+    private async Task ReconcileAsync()
     {
         if (!await _reconcileGate.WaitAsync(0))
         {
@@ -134,7 +129,6 @@ public sealed class AsusLuxKeysAppContext : ApplicationContext
         {
             if (!_settings.Enabled)
             {
-                ResetPendingState();
                 return;
             }
 
@@ -146,20 +140,12 @@ public sealed class AsusLuxKeysAppContext : ApplicationContext
 
             var brightness = BrightnessRuleEngine.GetBrightness(lux.Value, _settings.Rules);
             var color = _keyboard.CanSetStaticColor ? SettingsStore.ParseColor(_settings.Color) : (Color?)null;
-            var desired = new KeyboardLightState(color, brightness);
-            if (_keyboard.LastApplied == desired)
-            {
-                ResetPendingState();
-                return;
-            }
-
-            if (!ShouldApplyDesiredState(desired, countAsStableTick, IsOptionsFormOpen))
+            if (_keyboard.CanReadBrightness && _keyboard.GetCurrentBrightness() == brightness)
             {
                 return;
             }
 
             await _keyboard.SetAsync(brightness, color);
-            ResetPendingState();
         }
         catch (Exception ex)
         {
@@ -170,36 +156,4 @@ public sealed class AsusLuxKeysAppContext : ApplicationContext
             _reconcileGate.Release();
         }
     }
-
-    private bool ShouldApplyDesiredState(KeyboardLightState desired, bool scheduledTick, bool optionsFormOpen)
-    {
-        if (optionsFormOpen)
-        {
-            ResetPendingState();
-            return true;
-        }
-
-        if (_pendingState != desired)
-        {
-            _pendingState = desired;
-            _pendingStateTicks = scheduledTick ? 1 : 0;
-            AppLog.Write($"Pending keyboard state {desired.Brightness.ToDisplayText()}.");
-            return false;
-        }
-
-        if (scheduledTick)
-        {
-            _pendingStateTicks++;
-        }
-
-        return _pendingStateTicks >= AppTiming.RequiredStableSignalTicks;
-    }
-
-    private void ResetPendingState()
-    {
-        _pendingState = null;
-        _pendingStateTicks = 0;
-    }
-
-    private bool IsOptionsFormOpen => _optionsForm is { IsDisposed: false };
 }
