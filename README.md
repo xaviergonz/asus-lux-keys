@@ -98,3 +98,7 @@ git push origin v1.0.0
 ```
 
 The release workflow builds the Release version, publishes the `win-x64` app, zips it as `AsusLuxKeys-win-x64.zip`, and attaches it to the GitHub Release.
+
+## License
+
+AsusLuxKeys is licensed under the [MIT License](LICENSE).
