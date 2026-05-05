@@ -13,8 +13,6 @@ permissions:
 
 env:
   DOTNET_VERSION: 10.0.x
-  SOLUTION_FILE: AsusLuxKeys.slnx
-  APP_PROJECT: src/AsusLuxKeys/AsusLuxKeys.csproj
 
 jobs:
   build:
@@ -30,14 +28,14 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Restore
-        run: dotnet restore $env:SOLUTION_FILE
-
       - name: Build
-        run: dotnet build $env:SOLUTION_FILE --configuration Release --no-restore
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/build.ps1 -Configuration Release
+
+      - name: Test
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/test.ps1 -Configuration Release
 
       - name: Publish app
-        run: dotnet publish $env:APP_PROJECT --configuration Release --runtime win-x64 --self-contained false --output publish
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/publish.ps1 -Configuration Release -Runtime win-x64 -Output publish
 
       - name: Package app
         run: Compress-Archive -Path publish\* -DestinationPath AsusLuxKeys-win-x64.zip -Force

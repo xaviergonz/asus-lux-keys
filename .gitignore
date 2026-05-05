@@ -1,4 +1,5 @@
 .dotnet/
+.nuget/
 
 bin/
 obj/

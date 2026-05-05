@@ -50,16 +50,10 @@ Options auto-save after valid changes. If a lumens value is incomplete or invali
 
 ## Development Commands
 
-Restore dependencies:
-
-```powershell
-dotnet restore AsusLuxKeys.slnx
-```
-
 Build:
 
 ```powershell
-dotnet build AsusLuxKeys.slnx
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build.ps1
 ```
 
 Run the tray app:
@@ -71,20 +65,16 @@ dotnet run --project src\AsusLuxKeys\AsusLuxKeys.csproj
 Run unit tests:
 
 ```powershell
-dotnet test AsusLuxKeys.slnx
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\test.ps1
 ```
 
-Run unit tests without rebuilding:
+Publish the Windows x64 app:
 
 ```powershell
-dotnet test AsusLuxKeys.slnx --no-build
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\publish.ps1
 ```
 
-Check formatting:
-
-```powershell
-dotnet format AsusLuxKeys.slnx --verify-no-changes
-```
+Shared script paths live in `scripts\config.ps1`.
 
 ## Publishing a Release
 
